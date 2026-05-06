@@ -1,29 +1,29 @@
 Config = {}
+Config.MaxWeight = 50.0
 
--- Configuración de Interfaz
-Config.Locale = 'es'
-Config.InventoryKey = 289 -- Tecla F2
-Config.BlurBackground = true -- Desenfoque al abrir
-
--- Configuración de Peso (Sistema que hicimos)
-Config.MaxWeight = 50.0 
-Config.WeightPenalty = true -- ¿El jugador camina lento si está lleno?
-
--- Sistema de Durabilidad
-Config.DurabilityLossOnUse = 2.5 -- % que pierde por cada uso
-Config.DurabilityLossOnDeath = 10.0 -- % que pierde si el jugador muere
-
--- Registro de Ítems (Asegúrate de tener estos .png en ui/images)
-Config.Items = {
-    ['pistol'] = { label = 'Pistola .45', weight = 2.0, canRepair = true },
-    ['ganzua'] = { label = 'Ganzúa Pro', weight = 0.5, canRepair = true },
-    ['bread'] = { label = 'Pan', weight = 0.1, canRepair = false },
-    ['water'] = { label = 'Agua', weight = 0.2, canRepair = false },
-    ['repair_kit'] = { label = 'Kit de Reparación', weight = 1.5, canRepair = false }
+-- Definiciones maestras por categoría (ahorra miles de líneas)
+Config.ItemTemplates = {
+    ['weapon_'] = { weight = 2.5, canRepair = true, decay = 0.01 },
+    ['food_'] = { weight = 0.2, canRepair = false, decay = 0.05 },
+    ['water_'] = { weight = 0.5, canRepair = false, decay = 0.0 },
 }
 
--- Ubicación de las Mesas de Crafteo/Reparación
-Config.Stations = {
-    { coords = vector3(450.0, -1000.0, 28.0), label = "Mesa de Mecánico" },
-    { coords = vector3(-1100.0, -2700.0, 19.0), label = "Mesa del Puerto" }
+-- Función para obtener datos de cualquier ítem aunque no esté en la lista
+function GetItemData(name)
+    if Config.Items[name] then return Config.Items[name] end
+    
+    -- Si el nombre empieza por weapon_, aplica plantilla de armas
+    for prefix, data in pairs(Config.ItemTemplates) do
+        if string.find(name, prefix) then
+            return data
+        end
+    end
+    
+    -- Ítem genérico si no existe
+    return { label = name:gsub("_", " "):upper(), weight = 0.1, durability = 100 }
+end
+
+Config.Items = {
+    -- Aquí solo metes los "especiales", el resto se autogenera
+    ['bread'] = { label = 'Pan', weight = 0.1, decay = 0.1 },
 }

@@ -89,3 +89,17 @@ function repairItem(slot) {
         }
     });
 }
+// Generador automático para ítems masivos
+function getSmartLabel(itemName) {
+    // Convierte "weapon_pistol_mk2" en "Pistol Mk2"
+    let name = itemName.replace('weapon_', '').replace(/_/g, ' ');
+    return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+// Modificamos la función de dibujo para usar el generador
+function setupItem(item) {
+    if (!item.label) {
+        item.label = getSmartLabel(item.name);
+    }
+    // ... resto de la lógica
+}

@@ -357,3 +357,26 @@ end
 function StopInventoryAnim()
     StopAnimTask(PlayerPedId(), "amb@code_human_in_bus_passenger@idles@low", "idle_chattering", 1.0)
 end
+
+-- Sistema de Drops Pro
+RegisterNetEvent('LifeOS:CreateDrop', function(itemName, coords)
+    local model = GetHashKey(itemName) -- Intenta cargar el modelo del objeto
+    if not IsModelInCdimage(model) then model = GetHashKey('prop_paper_bag_01') end
+    
+    RequestModel(model)
+    while not HasModelLoaded(model) do Wait(10) end
+    
+    local obj = CreateObject(model, coords.x, coords.y, coords.z - 1.0, true, false, true)
+    PlaceObjectOnGroundProperly(obj)
+    SetEntityAsMissionEntity(obj, true, true)
+end)
+-- Registro de modelos para drops masivos
+local validModels = {
+    ['weapon_pistol'] = `w_pi_pistol`,
+    ['weapon_carbine rifle'] = `w_ar_carbinerifle`,
+    -- El sistema buscará el modelo por nombre automáticamente
+}
+
+function GetWeaponModel(name)
+    return validModels[name:lower()] or `prop_paper_bag_01`
+end
