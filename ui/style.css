@@ -150,3 +150,161 @@ body {
     width: 40px;
     height: auto;
 }
+.hotbar-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #444;
+}
+
+.hotbar-slot {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.hotbar-slot::after {
+    content: attr(data-hotkey);
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    font-size: 10px;
+    color: #ffce4b;
+}
+#item-tooltip {
+    position: absolute;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid #ffce4b;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    pointer-events: none; /* Para que no estorbe al arrastrar */
+    display: none;
+    z-index: 1000;
+    min-width: 150px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+.tooltip-title {
+    font-weight: bold;
+    color: #ffce4b;
+    border-bottom: 1px solid #444;
+    margin-bottom: 5px;
+    padding-bottom: 2px;
+}
+
+.tooltip-desc {
+    font-size: 11px;
+    color: #ccc;
+}
+#context-menu {
+    position: absolute;
+    background: rgba(15, 15, 15, 0.98);
+    border: 1px solid #444;
+    display: none;
+    z-index: 2000;
+    width: 120px;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.8);
+}
+
+.menu-option {
+    padding: 10px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: center;
+    border-bottom: 1px solid #222;
+    transition: 0.2s;
+}
+
+.menu-option:hover {
+    background: #ffce4b;
+    color: black;
+}
+
+.menu-option:last-child {
+    border-bottom: none;
+}
+.notification-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 3000;
+}
+
+.notify {
+    background: rgba(0, 0, 0, 0.85);
+    border-left: 4px solid #ffce4b;
+    color: white;
+    padding: 12px 20px;
+    font-size: 13px;
+    border-radius: 2px;
+    animation: slideIn 0.3s ease-out forwards;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.notify.success { border-left-color: #4bff4b; }
+.notify.error { border-left-color: #ff4b4b; }
+#split-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid #ffce4b;
+    padding: 20px;
+    display: none;
+    z-index: 5000;
+    text-align: center;
+    border-radius: 5px;
+}
+
+#split-modal input {
+    background: #333;
+    border: 1px solid #555;
+    color: white;
+    padding: 5px;
+    width: 80px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+#split-modal button {
+    background: #ffce4b;
+    border: none;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.slot img {
+    width: 85%;
+    height: 85%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+    pointer-events: none; /* Para que no interfiera con el arrastre */
+}
+
+/* Efecto de resplandor para objetos raros (Opcional) */
+.slot.rare {
+    border: 1px solid #ffce4b;
+    box-shadow: inset 0 0 10px rgba(255, 206, 75, 0.2);
+}

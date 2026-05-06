@@ -9,10 +9,10 @@
     <div class="main-wrapper">
         <div class="inventory-container">
             
-            <div class="dynamic-panel panel">
-                <div class="header">INTERACCIÓN / VEHÍCULO</div>
+            <div id="external-panel" class="panel" style="display: none;">
+                <div id="station-label" class="header">BAÚL / ARMARIO</div>
                 <div class="content">
-                    <div id="trunk-grid" class="inventory-grid">
+                    <div id="station-grid" class="inventory-grid">
                         </div>
                 </div>
             </div>
@@ -24,48 +24,13 @@
             </div>
 
             <div class="personal-panel panel">
-                <div class="header">INVENTARIO PERSONAL</div>
-                
+                <div class="header">MOCHILA PERSONAL</div>
                 <div class="grid-section">
-                    <div id="pockets-grid" class="inventory-grid">
-                        </div>
+                    <div id="pockets-grid" class="inventory-grid"></div>
+                </div>
                 </div>
 
-                <div class="equipment-section">
-                    <div class="header-small">EQUIPO DE COMBATE</div>
-                    <div class="equipment-slots">
-                        <div class="slot weapon" data-slot-type="fusil" data-hotkey="1">
-                            <img src="https://cfx-nui-inventory/html/images/assault_rifle.png" class="item-icon-bg">
-                            <span>FUSIL</span>
-                        </div>
-                        <div class="slot weapon" data-slot-type="pistola" data-hotkey="2">
-                            <img src="https://cfx-nui-inventory/html/images/pistol.png" class="item-icon-bg">
-                            <span>PISTOLA</span>
-                        </div>
-                        <div class="slot armor" data-slot-type="chaleco" data-hotkey="3">
-                            <img src="https://cfx-nui-inventory/html/images/armor.png" class="item-icon-bg">
-                            <span>CHALECO</span>
-                        </div>
-                        <div class="slot health" data-slot-type="curacion" data-hotkey="4">
-                            <img src="https://cfx-nui-inventory/html/images/medkit.png" class="item-icon-bg">
-                            <span>CURACIÓN</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
-
-        <div class="hotbar-container">
-            <div class="hotbar-slots">
-                <div class="hotbar-slot" data-hotkey="1"><img src="https://cfx-nui-inventory/html/images/assault_rifle.png"></div>
-                <div class="hotbar-slot" data-hotkey="2"><img src="https://cfx-nui-inventory/html/images/pistol.png"></div>
-                <div class="hotbar-slot" data-hotkey="3"><img src="https://cfx-nui-inventory/html/images/armor.png"></div>
-                <div class="hotbar-slot" data-hotkey="4"><img src="https://cfx-nui-inventory/html/images/medkit.png"></div>
-                <div class="hotbar-slot" data-hotkey="5"></div>
-            </div>
-        </div>
-
     </div>
     <script src="script.js"></script>
 </body>

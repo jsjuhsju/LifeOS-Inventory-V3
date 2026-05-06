@@ -1,11 +1,23 @@
 fx_version 'cerulean'
 game 'gta5'
+
 author 'jsjuhsju'
-description 'Inventario Survival Pro V3 - Estilo Rust con Doble Panel'
+description 'LifeOS Inventory V3 - Edición Táctica'
+version '1.0.0'
 
 ui_page 'ui/index.html'
+
 files {
     'ui/index.html',
     'ui/style.css',
-    -- 'ui/script.js' -- Descomentar cuando tengamos la lógica
+    'ui/script.js',
+    -- Aquí podrías añadir tus propios archivos .ogg o .mp3 locales después
+}
+
+client_scripts {
+    'client.lua'
+}
+
+server_scripts {
+    'server.lua'
 }
