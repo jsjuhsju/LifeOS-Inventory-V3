@@ -338,3 +338,22 @@ Citizen.CreateThread(function()
         end
     end
 end)
+
+-- Función para que el personaje se mueva al abrir el inventario
+function PlayInventoryAnim()
+    local ad = "amb@code_human_in_bus_passenger@idles@low"
+    local anim = "idle_chattering"
+    local playerPed = PlayerPedId()
+
+    RequestAnimDict(ad)
+    while not HasAnimDictLoaded(ad) do
+        Wait(10)
+    end
+
+    TaskPlayAnim(playerPed, ad, anim, 8.0, -8.0, -1, 49, 0, false, false, false)
+end
+
+-- Detener animación al cerrar
+function StopInventoryAnim()
+    StopAnimTask(PlayerPedId(), "amb@code_human_in_bus_passenger@idles@low", "idle_chattering", 1.0)
+end
