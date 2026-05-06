@@ -735,3 +735,20 @@ body {
     background: #ffce4b;
     left: 0%;
 }
+.durability-bar {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    height: 3px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    overflow: hidden;
+    display: none; /* Se activa solo si el ítem tiene durabilidad */
+}
+
+.durability-fill {
+    height: 100%;
+    width: 100%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}

@@ -307,3 +307,34 @@ RegisterNUICallback('LockpickFail', function(data, cb)
     TriggerServerEvent('LifeOS_Inventory:RemoveItem', 'lockpick', 1)
     cb('ok')
 end)
+local sleepTime = 1500 -- Por defecto revisa lento
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(sleepTime)
+        local playerPed = PlayerPedId()
+        local coords = GetEntityCoords(playerPed)
+        local nearby = false
+
+        -- Solo buscamos objetos si el jugador no está en un vehículo (ahorro de CPU)
+        if not IsPedInAnyVehicle(playerPed, false) then
+            for _, model in pairs(craftingProps) do
+                local hash = GetHashKey(model)
+                local obj = GetClosestObjectOfType(coords.x, coords.y, coords.z, 2.0, hash, false, false, false)
+                
+                if obj ~= 0 then
+                    nearby = true
+                    sleepTime = 500 -- Si hay algo cerca, revisamos más rápido para precisión
+                    break
+                else
+                    sleepTime = 1500 -- Si no hay nada, relajamos el procesador
+                end
+            end
+            
+            SendNUIMessage({
+                type = "update_crafting",
+                status = nearby
+            })
+        end
+    end
+end)

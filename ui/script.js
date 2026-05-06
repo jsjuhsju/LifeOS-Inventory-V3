@@ -871,3 +871,18 @@ window.addEventListener('keydown', function(e) {
         document.getElementById('lockpick-game').style.display = 'none';
     }
 });
+function updateSlotDurability(slotId, percent) {
+    const slot = document.querySelector(`.slot[data-slot="${slotId}"]`);
+    const bar = slot.querySelector('.durability-bar');
+    const fill = slot.querySelector('.durability-fill');
+
+    if (percent !== undefined) {
+        bar.style.display = 'block';
+        fill.style.width = percent + '%';
+        
+        // Color dinámico: Verde -> Amarillo -> Rojo
+        if (percent > 60) fill.style.backgroundColor = '#4bffeb';
+        else if (percent > 20) fill.style.backgroundColor = '#ffce4b';
+        else fill.style.backgroundColor = '#ff4b4b';
+    }
+}
