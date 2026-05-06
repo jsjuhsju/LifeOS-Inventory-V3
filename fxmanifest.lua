@@ -1,17 +1,13 @@
 fx_version 'cerulean'
 game 'gta5'
 
-author 'jsjuhsju'
-description 'LifeOS Inventory V3 - Edición Táctica'
-version '1.0.0'
+author 'LifeOS Team'
+description 'LifeOS Inventory V3 - Minimalist & Centered'
+version '1.1.0'
 
-ui_page 'ui/index.html'
-
-files {
-    'ui/index.html',
-    'ui/style.css',
-    'ui/script.js',
-    -- Aquí podrías añadir tus propios archivos .ogg o .mp3 locales después
+-- Registramos el Config primero para que otros archivos lo lean
+shared_scripts {
+    'config.lua'
 }
 
 client_scripts {
@@ -20,4 +16,15 @@ client_scripts {
 
 server_scripts {
     'server.lua'
+}
+
+-- Archivos de la interfaz (UI)
+ui_page 'ui/index.html'
+
+files {
+    'ui/index.html',
+    'ui/style.css',
+    'ui/script.js',
+    'ui/images/*.png',
+    'ui/sounds/*.mp3'
 }
