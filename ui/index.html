@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
-    <title>LifeOS Inventory V3</title>
+    <title>LifeOS Inventory V3 - jsjuhsju</title>
 </head>
 <body>
     <div class="main-wrapper">
         <div class="inventory-container">
             
             <div class="dynamic-panel panel">
-                <div class="header">INTERACCIÓN</div>
+                <div class="header">INTERACCIÓN / VEHÍCULO</div>
                 <div class="content">
-                    <div class="placeholder">Panel de Saqueo / Maletero</div>
+                    <div id="trunk-grid" class="inventory-grid">
+                        </div>
                 </div>
             </div>
 
             <div class="character-panel">
                 <div class="player-preview">
-                    <div class="placeholder">Clon 3D (Placeholder)</div>
+                    <div class="ped-container"></div>
                 </div>
             </div>
 
@@ -31,18 +32,24 @@
                 </div>
 
                 <div class="equipment-section">
-                    <div class="header-small">EQUIPO / USO RÁPIDO</div>
+                    <div class="header-small">EQUIPO DE COMBATE</div>
                     <div class="equipment-slots">
-                        <div class="slot small clothing" data-slot-type="head">Cabeza</div>
-                        <div class="slot small clothing" data-slot-type="torso">Torso</div>
-                        <div class="slot small clothing" data-slot-type="backpack">Bolso</div>
-                        <div class="slot small clothing" data-slot-type="legs">Piernas</div>
-                        <div class="slot small clothing" data-slot-type="feet">Pies</div>
-                        
-                        <div class="slot small weapon" data-slot-type="fusil" data-hotkey="1">Fusil (1)</div>
-                        <div class="slot small weapon" data-slot-type="pistola" data-hotkey="2">Pistola (2)</div>
-                        <div class="slot small armor" data-slot-type="chaleco" data-hotkey="3">Chaleco (3)</div>
-                        <div class="slot small health" data-slot-type="curacion" data-hotkey="4">Curación (4)</div>
+                        <div class="slot weapon" data-slot-type="fusil" data-hotkey="1">
+                            <img src="https://cfx-nui-inventory/html/images/assault_rifle.png" class="item-icon-bg">
+                            <span>FUSIL</span>
+                        </div>
+                        <div class="slot weapon" data-slot-type="pistola" data-hotkey="2">
+                            <img src="https://cfx-nui-inventory/html/images/pistol.png" class="item-icon-bg">
+                            <span>PISTOLA</span>
+                        </div>
+                        <div class="slot armor" data-slot-type="chaleco" data-hotkey="3">
+                            <img src="https://cfx-nui-inventory/html/images/armor.png" class="item-icon-bg">
+                            <span>CHALECO</span>
+                        </div>
+                        <div class="slot health" data-slot-type="curacion" data-hotkey="4">
+                            <img src="https://cfx-nui-inventory/html/images/medkit.png" class="item-icon-bg">
+                            <span>CURACIÓN</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -51,14 +58,15 @@
 
         <div class="hotbar-container">
             <div class="hotbar-slots">
-                <div class="hotbar-slot" data-hotkey="1">1</div>
-                <div class="hotbar-slot" data-hotkey="2">2</div>
-                <div class="hotbar-slot" data-hotkey="3">3</div>
-                <div class="hotbar-slot" data-hotkey="4">4</div>
-                <div class="hotbar-slot" data-hotkey="5">5</div>
+                <div class="hotbar-slot" data-hotkey="1"><img src="https://cfx-nui-inventory/html/images/assault_rifle.png"></div>
+                <div class="hotbar-slot" data-hotkey="2"><img src="https://cfx-nui-inventory/html/images/pistol.png"></div>
+                <div class="hotbar-slot" data-hotkey="3"><img src="https://cfx-nui-inventory/html/images/armor.png"></div>
+                <div class="hotbar-slot" data-hotkey="4"><img src="https://cfx-nui-inventory/html/images/medkit.png"></div>
+                <div class="hotbar-slot" data-hotkey="5"></div>
             </div>
         </div>
 
     </div>
+    <script src="script.js"></script>
 </body>
 </html>

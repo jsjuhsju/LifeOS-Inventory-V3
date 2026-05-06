@@ -131,3 +131,22 @@ body {
     position: absolute; top: 3px; left: 4px;
     font-size: 9px; color: rgba(255, 255, 255, 0.15);
 }
+.item-icon-bg {
+    width: 80%;
+    height: auto;
+    opacity: 0.2; /* Estilo fantasma para cuando el slot está vacío */
+    filter: grayscale(100%);
+    position: absolute;
+}
+
+.slot span {
+    position: absolute;
+    bottom: 2px;
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.hotbar-slot img {
+    width: 40px;
+    height: auto;
+}
