@@ -482,3 +482,155 @@ function SendNotification(msg, type = "info") {
         setTimeout(() => notif.remove(), 500);
     }, 5000);
 }
+let draggedItem = null;
+let fromSlot = null;
+
+// Configurar los eventos de arrastre
+document.addEventListener('dragstart', function(e) {
+    if (e.target.classList.contains('item-icon')) {
+        draggedItem = e.target;
+        fromSlot = e.target.parentElement.getAttribute('data-slot');
+        e.target.classList.add('dragging');
+        
+        // Efecto de sonido al levantar
+        if (typeof playSound === "function") playSound('click_box', 0.2);
+    }
+});
+
+document.addEventListener('dragend', function(e) {
+    if (e.target.classList.contains('item-icon')) {
+        e.target.classList.remove('dragging');
+        document.querySelectorAll('.slot').forEach(s => s.classList.remove('drag-over'));
+    }
+});
+
+document.addEventListener('dragover', function(e) {
+    e.preventDefault(); // Necesario para permitir soltar
+    const slot = e.target.closest('.slot');
+    if (slot) {
+        slot.classList.add('drag-over');
+    }
+});
+
+document.addEventListener('dragleave', function(e) {
+    const slot = e.target.closest('.slot');
+    if (slot) {
+        slot.classList.remove('drag-over');
+    }
+});
+
+document.addEventListener('drop', function(e) {
+    e.preventDefault();
+    const toSlot = e.target.closest('.slot');
+    
+    if (toSlot && draggedItem) {
+        const toSlotId = toSlot.getAttribute('data-slot');
+        
+        // Lógica de intercambio visual
+        if (fromSlot !== toSlotId) {
+            moveItem(fromSlot, toSlotId);
+            if (typeof playSound === "function") playSound('pickup_object', 0.3);
+        }
+    }
+});
+
+function moveItem(from, to) {
+    // Aquí es donde el Inventario avisa a Lua que movimos algo
+    // Para que el servidor guarde el cambio en la base de datos
+    console.log("Movido de slot " + from + " al slot " + to);
+    SendNotification("Objeto movido", "success");
+    
+    // Aquí dispararíamos el callback hacia el servidor
+    /*
+    $.post('https://LifeOS_Inventory/MoveItem', JSON.stringify({
+        from: from,
+        to: to
+    }));
+    */
+}
+// Crear la zona de drop dinámicamente
+const dropZoneHTML = '<div id="drop-zone"><div class="drop-indicator">Soltar para tirar al suelo</div></div>';
+document.body.insertAdjacentHTML('afterbegin', dropZoneHTML);
+
+const dz = document.getElementById('drop-zone');
+
+// Al empezar a arrastrar, mostramos la zona de drop
+document.addEventListener('dragstart', function() {
+    dz.style.display = 'block';
+});
+
+// Al terminar, la ocultamos
+document.addEventListener('dragend', function() {
+    dz.style.display = 'none';
+});
+
+// Si soltamos en la zona de drop (fuera de un slot)
+dz.addEventListener('drop', function(e) {
+    if (draggedItem && !e.target.closest('.slot')) {
+        const itemName = draggedItem.parentElement.getAttribute('data-item');
+        
+        SendNotification("Has tirado " + itemName, "error");
+        if (typeof playSound === "function") playSound('drop_item', 0.4);
+        
+        // Aquí avisamos a Lua para que cree el objeto en el suelo
+        /*
+        $.post('https://LifeOS_Inventory/DropItem', JSON.stringify({
+            item: itemName,
+            coords: GetEntityCoords(PlayerPedId())
+        }));
+        */
+        
+        // Limpiamos el slot visualmente
+        draggedItem.parentElement.innerHTML = "";
+    }
+});
+// Insertar el HTML del diálogo
+const splitHTML = `
+    <div id="split-dialog">
+        <div style="color:#aaa; font-size:12px;">CANTIDAD A MOVER</div>
+        <input type="number" id="split-input" value="1" min="1">
+        <br>
+        <button class="split-btn" onclick="confirmSplit()">Confirmar</button>
+    </div>`;
+document.body.insertAdjacentHTML('beforeend', splitHTML);
+
+let pendingMove = null;
+
+function openSplitDialog(from, to) {
+    pendingMove = { from, to };
+    document.getElementById('split-dialog').style.display = 'block';
+    document.getElementById('split-input').focus();
+}
+
+function confirmSplit() {
+    const amount = document.getElementById('split-input').value;
+    if (amount > 0 && pendingMove) {
+        SendNotification("Movido: " + amount + " unidades", "success");
+        // Aquí enviarías la cantidad exacta al servidor Lua
+        console.log("Moviendo " + amount + " desde " + pendingMove.from + " a " + pendingMove.to);
+        
+        document.getElementById('split-dialog').style.display = 'none';
+        pendingMove = null;
+    }
+}
+// Función para equipar ropa/accesorios
+function equipItem(slotType, itemName) {
+    SendNotification("Equipando: " + itemName, "success");
+    
+    // Enviamos al cliente Lua qué slot y qué ítem es
+    $.post('https://LifeOS_Inventory/EquipItem', JSON.stringify({
+        slot: slotType,
+        item: itemName
+    }));
+}
+
+// Modificamos el evento 'drop' para detectar los slots de equipo
+document.addEventListener('drop', function(e) {
+    const equipSlot = e.target.closest('.equip-slot');
+    if (equipSlot && draggedItem) {
+        const slotType = equipSlot.getAttribute('data-slot');
+        const itemName = draggedItem.parentElement.getAttribute('data-item');
+        
+        equipItem(slotType, itemName);
+    }
+});

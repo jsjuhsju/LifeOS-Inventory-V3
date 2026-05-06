@@ -131,3 +131,37 @@ function toggleInventory(bool)
     PlayInventoryAnim(bool) -- Llamamos a la animación aquí
     if oldToggle then oldToggle(bool) end
 end
+RegisterNUICallback('EquipItem', function(data, cb)
+    local playerPed = PlayerPedId()
+    
+    if data.slot == "vest" then
+        -- Ejemplo: Poner chaleco antibalas (Componente 9)
+        SetPedComponentVariation(playerPed, 9, 1, 0, 0) 
+        SetArmour(playerPed, 100) -- Te da la protección real
+    elseif data.slot == "mask" then
+        -- Ejemplo: Poner máscara (Componente 1)
+        SetPedComponentVariation(playerPed, 1, 12, 0, 0)
+    elseif data.slot == "head" then
+        -- Ejemplo: Poner casco/gorra (Prop 0)
+        SetPedPropIndex(playerPed, 0, 10, 0, true)
+    end
+    
+    cb('ok')
+end)
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        -- Si el inventario NO está abierto, revisamos las teclas 1 al 4
+        if not inventoryOpen then
+            for i = 1, 4 do
+                if IsControlJustReleased(0, 156 + i) or IsDisabledControlJustReleased(0, 156 + i) then
+                    -- Enviamos al servidor la orden de usar el slot i
+                    TriggerServerEvent('LifeOS_Inventory:UseItemFromSlot', i)
+                    
+                    -- Efecto visual: Notificación rápida
+                    SendNotification("Usando objeto del slot " .. i, "info")
+                end
+            end
+        end
+    end
+end)
