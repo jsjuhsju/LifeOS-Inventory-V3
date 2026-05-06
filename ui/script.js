@@ -634,3 +634,240 @@ document.addEventListener('drop', function(e) {
         equipItem(slotType, itemName);
     }
 });
+// Crear el elemento tooltip
+const tooltip = document.createElement('div');
+tooltip.id = 'item-tooltip';
+document.body.appendChild(tooltip);
+
+document.addEventListener('mouseover', function(e) {
+    const slot = e.target.closest('.slot');
+    if (slot && slot.getAttribute('data-item')) {
+        const itemName = slot.getAttribute('data-item');
+        const itemData = ItemDatabase[itemName]; // Nuestra base de datos
+        
+        if (itemData) {
+            let metaHTML = `<span class="tooltip-title">${itemData.label}</span>`;
+            
+            // Si el ítem tiene metadata (ej: número de serie, durabilidad)
+            if (itemData.metadata) {
+                for (const [key, value] of Object.entries(itemData.metadata)) {
+                    metaHTML += `
+                        <div class="metadata-line">
+                            <span>${key}:</span>
+                            <span class="metadata-value">${value}</span>
+                        </div>`;
+                }
+            }
+            
+            tooltip.innerHTML = metaHTML;
+            tooltip.style.display = 'block';
+        }
+    }
+});
+
+document.addEventListener('mousemove', function(e) {
+    if (tooltip.style.display === 'block') {
+        tooltip.style.left = (e.pageX + 15) + 'px';
+        tooltip.style.top = (e.pageY + 15) + 'px';
+    }
+});
+
+document.addEventListener('mouseout', function(e) {
+    if (e.target.closest('.slot')) {
+        tooltip.style.display = 'none';
+    }
+});
+function moveItem(from, to) {
+    const fromItem = document.querySelector(`.slot[data-slot="${from}"]`).getAttribute('data-item');
+    const toItem = document.querySelector(`.slot[data-slot="${to}"]`).getAttribute('data-item');
+
+    // Lógica de Unión: Si 'from' es un silenciador y 'to' es una pistola
+    if (isAttachment(fromItem) && isWeapon(toItem)) {
+        SendNotification("Accesorio montado con éxito", "success");
+        if (typeof playSound === "function") playSound('weapon_attach', 0.5);
+        // Aquí avisarías al servidor para que actualice el Metadata de la pistola
+    } else {
+        // Movimiento normal de intercambio
+        console.log("Intercambio normal de " + from + " a " + to);
+    }
+}
+
+function isAttachment(name) { return name && name.includes('silencer'); }
+function isWeapon(name) { return name && name.includes('weapon'); }
+const Recipes = [
+    { name: "Chaleco Pesado", result: "vest", mats: "2x Metal, 1x Tela" },
+    { name: "Ganzúa Pro", result: "lockpick", mats: "1x Metal, 1x Cable" }
+];
+
+function loadRecipes() {
+    const list = document.getElementById('crafting-list');
+    list.innerHTML = "";
+    Recipes.forEach(recipe => {
+        list.innerHTML += `
+            <div class="recipe-card">
+                <div class="recipe-info">
+                    <div class="recipe-name">${recipe.name}</div>
+                    <div class="recipe-mats">${recipe.mats}</div>
+                </div>
+                <button class="craft-btn" onclick="startCraft('${recipe.result}')">FABRICAR</button>
+            </div>`;
+    });
+}
+
+function startCraft(item) {
+    SendNotification("Fabricando objeto...", "info");
+    // Simulamos un tiempo de espera para el crafteo
+    setTimeout(() => {
+        SendNotification("¡Éxito! Has fabricado un " + item, "success");
+        if (typeof playSound === "function") playSound('success_craft', 0.5);
+    }, 3000);
+}
+
+// Llamamos a cargar recetas al iniciar
+loadRecipes();
+const Recipes = [
+    { name: "Chaleco Pesado", result: "vest", mats: "2x Metal, 1x Tela" },
+    { name: "Ganzúa Pro", result: "lockpick", mats: "1x Metal, 1x Cable" }
+];
+
+function loadRecipes() {
+    const list = document.getElementById('crafting-list');
+    list.innerHTML = "";
+    Recipes.forEach(recipe => {
+        list.innerHTML += `
+            <div class="recipe-card">
+                <div class="recipe-info">
+                    <div class="recipe-name">${recipe.name}</div>
+                    <div class="recipe-mats">${recipe.mats}</div>
+                </div>
+                <button class="craft-btn" onclick="startCraft('${recipe.result}')">FABRICAR</button>
+            </div>`;
+    });
+}
+
+function startCraft(item) {
+    SendNotification("Fabricando objeto...", "info");
+    // Simulamos un tiempo de espera para el crafteo
+    setTimeout(() => {
+        SendNotification("¡Éxito! Has fabricado un " + item, "success");
+        if (typeof playSound === "function") playSound('success_craft', 0.5);
+    }, 3000);
+}
+
+// Llamamos a cargar recetas al iniciar
+loadRecipes();
+function startProgressBar(duration, label, callback) {
+    const container = document.getElementById('progress-container') || createProgressContainer();
+    const fill = container.querySelector('.progress-fill');
+    const text = container.querySelector('.progress-text');
+    
+    container.style.display = 'flex';
+    text.innerText = label;
+    fill.style.width = '0%';
+
+    let start = 0;
+    const interval = setInterval(() => {
+        start += 100 / (duration / 100);
+        fill.style.width = start + '%';
+        
+        if (start >= 100) {
+            clearInterval(interval);
+            container.style.display = 'none';
+            if (callback) callback();
+        }
+    }, 100);
+}
+
+function createProgressContainer() {
+    const html = `
+        <div id="progress-container">
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <div class="progress-text"></div>
+        </div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+    return document.getElementById('progress-container');
+}
+
+// Modificamos startCraft para usar la barra
+function startCraft(item) {
+    startProgressBar(3000, "Fabricando " + item + "...", () => {
+        SendNotification("¡Éxito! Has fabricado un " + item, "success");
+    });
+}
+window.addEventListener('message', function(event) {
+    if (event.data.type === "update_crafting") {
+        const craftTab = document.getElementById('crafting-tab');
+        if (event.data.status) {
+            craftTab.style.display = 'block';
+            SendNotification("Mesa de trabajo detectada", "info");
+        } else {
+            craftTab.style.display = 'none';
+        }
+    }
+});
+function startCraft(item) {
+    // Primero revisamos si el servidor nos da permiso
+    $.post('https://LifeOS_Inventory/CheckMaterials', JSON.stringify({
+        item: item
+    }), function(hasMaterials) {
+        if (hasMaterials) {
+            startProgressBar(5000, "Fabricando " + item + "...", () => {
+                // Una vez terminada la barra, pedimos al servidor que nos dé el objeto
+                $.post('https://LifeOS_Inventory/GiveCraftedItem', JSON.stringify({
+                    item: item
+                }));
+            });
+        } else {
+            SendNotification("No tienes materiales suficientes", "error");
+        }
+    });
+}
+window.addEventListener('message', function(event) {
+    if (event.data.action === "openSecondary") {
+        const secondary = document.getElementById('secondary-inventory');
+        const title = secondary.querySelector('.panel-header');
+        
+        secondary.style.display = 'block';
+        title.innerText = event.data.type === "trunk" ? "MALETERO: " + event.data.id : "GUANTERA";
+        
+        // Aquí cargaríamos los ítems que tiene ese coche guardados en la DB
+        loadSecondaryItems(event.data.id);
+    }
+});
+
+function loadSecondaryItems(plate) {
+    console.log("Cargando ítems del coche con placa: " + plate);
+    // Aquí iría el $.post para traer los datos del servidor
+}
+let isLockpicking = false;
+let barPos = 0;
+
+function startLockpick() {
+    document.getElementById('lockpick-game').style.display = 'block';
+    isLockpicking = true;
+    barPos = 0;
+    animateLockpick();
+}
+
+function animateLockpick() {
+    if (!isLockpicking) return;
+    barPos += 2;
+    if (barPos > 100) barPos = 0;
+    document.querySelector('.lockpick-bar').style.left = barPos + '%';
+    requestAnimationFrame(animateLockpick);
+}
+
+window.addEventListener('keydown', function(e) {
+    if (e.key === "e" || e.key === "E" && isLockpicking) {
+        const target = 70; // La zona de éxito en el CSS
+        if (barPos >= target && barPos <= target + 13) {
+            SendNotification("¡Cerradura abierta!", "success");
+            $.post('https://LifeOS_Inventory/LockpickSuccess');
+        } else {
+            SendNotification("La ganzúa se ha doblado", "error");
+            $.post('https://LifeOS_Inventory/LockpickFail');
+        }
+        isLockpicking = false;
+        document.getElementById('lockpick-game').style.display = 'none';
+    }
+});

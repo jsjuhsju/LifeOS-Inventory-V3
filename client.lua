@@ -165,3 +165,145 @@ Citizen.CreateThread(function()
         end
     end
 end)
+function SetInventoryBlur(status)
+    if status then
+        TriggerScreenblurFadeIn(1000) -- Desenfoque en 1 segundo
+    else
+        TriggerScreenblurFadeOut(1000) -- Quitar desenfoque
+    end
+end
+
+-- Lo conectamos al toggle principal
+local baseToggle = toggleInventory
+function toggleInventory(bool)
+    SetInventoryBlur(bool)
+    if baseToggle then baseToggle(bool) end
+end
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(2000) -- Revisar cada 2 segundos para no laggear
+        if currentWeight > maxWeight then
+            local playerPed = PlayerPedId()
+            -- Si el peso supera el máximo, el jugador no puede correr
+            DisableControlAction(0, 21, true) -- Desactivar Sprint (Shift)
+            SetPedMoveRateOverride(playerPed, 0.8) -- Caminar más lento
+            
+            if not isOverweightNotified then
+                SendNotification("Estás demasiado pesado para correr", "error")
+                isOverweightNotified = true
+            end
+        else
+            isOverweightNotified = false
+        end
+    end
+end)
+-- Lista de modelos de mesas de trabajo (props de GTA)
+local craftingProps = {
+    "prop_toolchest_01",
+    "prop_toolchest_02",
+    "prop_tool_bench02",
+    "prop_tool_bench02_ld"
+}
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(1000) -- Revisa cada segundo
+        local playerPed = PlayerPedId()
+        local coords = GetEntityCoords(playerPed)
+        local nearbyBench = false
+
+        for _, model in pairs(craftingProps) do
+            local hash = GetHashKey(model)
+            local closestObj = GetClosestObjectOfType(coords.x, coords.y, coords.z, 2.0, hash, false, false, false)
+            
+            if closestObj ~= 0 then
+                nearbyBench = true
+                break
+            end
+        end
+
+        -- Avisamos al inventario si puede mostrar el crafteo
+        SendNUIMessage({
+            type = "update_crafting",
+            status = nearbyBench
+        })
+    end
+end)
+-- Función para obtener el vehículo frente al jugador
+function GetVehicleInFront()
+    local playerPed = PlayerPedId()
+    local coords = GetEntityCoords(playerPed)
+    local entityWorld = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 3.0, 0.0)
+    local rayHandle = CastRayPointToPoint(coords.x, coords.y, coords.z, entityWorld.x, entityWorld.y, entityWorld.z, 10, playerPed, 0)
+    local a, b, c, d, vehicle = GetRaycastResult(rayHandle)
+    return vehicle
+end
+
+-- Modificamos la apertura del inventario
+RegisterCommand('openInventory', function()
+    local vehicle = GetVehicleInFront()
+    local plate = nil
+    
+    if DoesEntityExist(vehicle) then
+        plate = GetVehicleNumberPlateText(vehicle)
+        -- Abrir maletero físicamente (animación)
+        SetVehicleDoorOpen(vehicle, 5, false, false)
+        
+        SendNUIMessage({
+            action = "openSecondary",
+            type = "trunk",
+            id = plate
+        })
+    end
+    
+    toggleInventory(true) -- Abre tu mochila normal
+end)
+-- Al cerrar el inventario
+function closeInventory()
+    local vehicle = GetVehicleInFront()
+    if DoesEntityExist(vehicle) then
+        SetVehicleDoorShut(vehicle, 5, false) -- Cerrar maletero
+    end
+    toggleInventory(false)
+end
+RegisterCommand('openInventory', function()
+    local vehicle = GetVehicleInFront()
+    
+    if DoesEntityExist(vehicle) then
+        local lockStatus = GetVehicleDoorLockStatus(vehicle)
+        
+        -- En GTA, 1 es desbloqueado, 2 es bloqueado
+        if lockStatus == 1 then
+            local plate = GetVehicleNumberPlateText(vehicle)
+            
+            -- Animación real: Abrir el maletero
+            SetVehicleDoorOpen(vehicle, 5, false, false)
+            
+            SendNUIMessage({
+                action = "openSecondary",
+                type = "trunk",
+                id = plate
+            })
+            toggleInventory(true)
+        else
+            -- Si está cerrado, mandamos un aviso en vez de abrir
+            SendNotification("El vehículo está cerrado con llave", "error")
+            toggleInventory(true) -- Abre solo tu mochila normal
+        end
+    else
+        toggleInventory(true) -- No hay coche, abre mochila normal
+    end
+end)
+RegisterNUICallback('LockpickSuccess', function(data, cb)
+    local vehicle = GetVehicleInFront()
+    SetVehicleDoorsLocked(vehicle, 1) -- Desbloquear
+    SetVehicleDoorOpen(vehicle, 5, false, false) -- Abrir maletero
+    SendNotification("Has forzado el maletero", "success")
+    cb('ok')
+end)
+
+RegisterNUICallback('LockpickFail', function(data, cb)
+    -- Aquí podríamos quitarle la ganzúa del inventario al jugador
+    TriggerServerEvent('LifeOS_Inventory:RemoveItem', 'lockpick', 1)
+    cb('ok')
+end)

@@ -633,3 +633,105 @@ body {
     font-family: 'Courier New', monospace;
     font-weight: bold;
 }
+#item-tooltip {
+    position: absolute;
+    background: rgba(5, 5, 5, 0.95);
+    border: 1px solid #ffce4b;
+    padding: 10px;
+    color: white;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    pointer-events: none;
+    display: none;
+    z-index: 10000;
+    min-width: 150px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+}
+
+.tooltip-title {
+    color: #ffce4b;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 1px solid #333;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.metadata-line {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3px;
+    color: #aaa;
+}
+
+.metadata-value {
+    color: #fff;
+}
+.inventory-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    width: 90%;
+}
+
+#secondary-inventory {
+    width: 400px;
+    height: 600px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(255, 206, 75, 0.2);
+}
+.recipe-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #4bffeb33;
+    margin-bottom: 5px;
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 3px;
+}
+
+.recipe-info { text-align: left; }
+.recipe-name { color: #4bffeb; font-size: 11px; font-weight: bold; }
+.recipe-mats { font-size: 9px; color: #888; }
+
+.craft-btn {
+    background: #4bffeb;
+    color: #000;
+    border: none;
+    padding: 5px 10px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.craft-btn:hover { background: #fff; }
+#lockpick-game {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 20px;
+    background: rgba(0,0,0,0.8);
+    border: 2px solid #444;
+    display: none;
+    z-index: 30000;
+}
+
+.lockpick-target {
+    position: absolute;
+    width: 40px;
+    height: 100%;
+    background: rgba(75, 255, 235, 0.5);
+    left: 70%; /* Zona de éxito */
+}
+
+.lockpick-bar {
+    position: absolute;
+    width: 5px;
+    height: 100%;
+    background: #ffce4b;
+    left: 0%;
+}
