@@ -1,754 +1,155 @@
+:root {
+    --bg-color: rgba(15, 15, 15, 0.95); /* Gris muy oscuro mate */
+    --border-color: rgba(60, 60, 60, 0.5); /* Borde fino y sutil */
+    --accent-color: #4bffeb; /* Cyan para tooltips y barras */
+    --text-color: #ffffff;
+    --slot-size: 90px;
+}
+
 body {
-    margin: 0; padding: 0;
-    background: rgba(0, 0, 0, 0.6); /* Fondo blur nativo de CFX */
-    font-family: 'Arial', sans-serif;
-    color: white;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente limpia */
     overflow: hidden;
+    color: var(--text-color);
+    background-color: transparent; /* El blur se maneja en Lua */
 }
 
-.main-wrapper {
-    width: 100vw; height: 100vh;
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-}
-
-.inventory-container {
-    width: 1200px; height: 800px;
-    display: flex; gap: 20px;
-    margin-bottom: 20px;
-}
-
-.panel {
-    width: 38%;
-    background: rgba(15, 15, 15, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    display: flex; flex-direction: column;
-    padding: 15px;
-}
-
-.character-panel {
-    width: 24%;
-    display: flex; justify-content: center; align-items: center;
-}
-
-.player-preview {
-    width: 100%; height: 100%;
-    background: rgba(10, 10, 10, 0.5);
-    border-radius: 8px;
-    /* Placeholder */
-    display: flex; justify-content: center; align-items: center;
-    border: 1px solid rgba(255, 255, 255, 0.02);
-}
-
-.placeholder {
-    color: rgba(255, 255, 255, 0.3); font-size: 14px;
-}
-
-.header {
-    font-size: 16px; font-weight: bold; text-transform: uppercase;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 8px; margin-bottom: 15px;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.grid-section {
-    flex: 1; margin-bottom: 15px;
-}
-
-.inventory-grid {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr); /* 10 columnas fijos */
-    grid-gap: 5px;
-    /* Generado por JS para 100 slots */
-}
-
-/* Equipo & Uso Rápido (V3) */
-.equipment-section {
-    height: 120px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding-top: 10px;
-}
-
-.header-small {
-    font-size: 12px; font-weight: bold; text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5); margin-bottom: 10px;
-}
-
-.equipment-slots {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 columnas para la ropa */
-    grid-gap: 5px;
-}
-
-.slot {
-    aspect-ratio: 1/1;
-    background: rgba(25, 25, 25, 0.9);
-    border-radius: 4px;
-    border: 1px solid transparent;
-    transition: 0.2s;
-    display: flex; justify-content: center; align-items: center;
-    font-size: 10px; color: rgba(255, 255, 255, 0.4);
-    text-transform: uppercase;
-    position: relative;
-}
-
-/* Slots de combate específicos (V3 cambios) */
-.slot.weapon { border-left: 2px solid #ff4b4b; grid-column: span 1; }
-.slot.armor { border-left: 2px solid #4bafff; grid-column: span 1; }
-.slot.health { border-left: 2px solid #4bff4b; grid-column: span 1; }
-
-.slot::after {
-    content: attr(data-hotkey);
-    position: absolute; top: 2px; left: 3px;
-    font-size: 8px; color: rgba(255, 255, 255, 0.2);
-}
-
-/* Hotbar inferior */
-.hotbar-container {
-    width: 600px; height: 80px;
-    background: rgba(10, 10, 10, 0.8);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    display: flex; justify-content: center; align-items: center;
-}
-
-.hotbar-slots {
-    display: flex; gap: 8px;
-}
-
-.hotbar-slot {
-    width: 60px; height: 60px;
-    background: rgba(30, 30, 30, 0.8);
-    border-radius: 4px;
-    display: flex; justify-content: center; align-items: center;
-    font-size: 12px; color: rgba(255, 255, 255, 0.3);
-    position: relative;
-}
-
-.hotbar-slot::before {
-    content: attr(data-hotkey);
-    position: absolute; top: 3px; left: 4px;
-    font-size: 9px; color: rgba(255, 255, 255, 0.15);
-}
-.item-icon-bg {
-    width: 80%;
-    height: auto;
-    opacity: 0.2; /* Estilo fantasma para cuando el slot está vacío */
-    filter: grayscale(100%);
+#inventory-main {
     position: absolute;
-}
-
-.slot span {
-    position: absolute;
-    bottom: 2px;
-    font-size: 8px;
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.hotbar-slot img {
-    width: 40px;
-    height: auto;
-}
-.hotbar-container {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #444;
-}
-
-.hotbar-slot {
-    width: 60px;
-    height: 60px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-
-.hotbar-slot::after {
-    content: attr(data-hotkey);
-    position: absolute;
-    top: 2px;
-    left: 5px;
-    font-size: 10px;
-    color: #ffce4b;
-}
-#item-tooltip {
-    position: absolute;
-    background: rgba(10, 10, 10, 0.95);
-    border: 1px solid #ffce4b;
-    color: white;
-    padding: 10px;
-    border-radius: 4px;
-    pointer-events: none; /* Para que no estorbe al arrastrar */
-    display: none;
-    z-index: 1000;
-    min-width: 150px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
-}
-
-.tooltip-title {
-    font-weight: bold;
-    color: #ffce4b;
-    border-bottom: 1px solid #444;
-    margin-bottom: 5px;
-    padding-bottom: 2px;
-}
-
-.tooltip-desc {
-    font-size: 11px;
-    color: #ccc;
-}
-#context-menu {
-    position: absolute;
-    background: rgba(15, 15, 15, 0.98);
-    border: 1px solid #444;
-    display: none;
-    z-index: 2000;
-    width: 120px;
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.8);
-}
-
-.menu-option {
-    padding: 10px;
-    color: white;
-    font-size: 12px;
-    cursor: pointer;
-    text-align: center;
-    border-bottom: 1px solid #222;
-    transition: 0.2s;
-}
-
-.menu-option:hover {
-    background: #ffce4b;
-    color: black;
-}
-
-.menu-option:last-child {
-    border-bottom: none;
-}
-.notification-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 3000;
-}
-
-.notify {
-    background: rgba(0, 0, 0, 0.85);
-    border-left: 4px solid #ffce4b;
-    color: white;
-    padding: 12px 20px;
-    font-size: 13px;
-    border-radius: 2px;
-    animation: slideIn 0.3s ease-out forwards;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-@keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-.notify.success { border-left-color: #4bff4b; }
-.notify.error { border-left-color: #ff4b4b; }
-#split-modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(20, 20, 20, 0.95);
-    border: 1px solid #ffce4b;
-    padding: 20px;
-    display: none;
-    z-index: 5000;
-    text-align: center;
-    border-radius: 5px;
-}
-
-#split-modal input {
-    background: #333;
-    border: 1px solid #555;
-    color: white;
-    padding: 5px;
-    width: 80px;
-    text-align: center;
-    margin: 10px 0;
-}
-
-#split-modal button {
-    background: #ffce4b;
-    border: none;
-    padding: 5px 15px;
-    cursor: pointer;
-    font-weight: bold;
-}
-.slot img {
-    width: 85%;
-    height: 85%;
-    object-fit: contain;
-    filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
-    pointer-events: none; /* Para que no interfiera con el arrastre */
-}
-
-/* Efecto de resplandor para objetos raros (Opcional) */
-.slot.rare {
-    border: 1px solid #ffce4b;
-    box-shadow: inset 0 0 10px rgba(255, 206, 75, 0.2);
-}
-
-
-
-.health-fill { background: #ff4b4b; box-shadow: 0 0 10px #ff4b4b; }
-.armor-fill { background: #4ba3ff; box-shadow: 0 0 10px #4ba3ff; }
-.hunger-fill { background: #ffce4b; box-shadow: 0 0 10px #ffce4b; }
-.thirst-fill { background: #4bffeb; box-shadow: 0 0 10px #4bffeb; }
-/* Efecto de desenfoque para el fondo del juego */
-body {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    background-color: rgba(0, 0, 0, 0.4); /* Oscurece un poco el fondo */
-    transition: backdrop-filter 0.3s ease;
-}
-.property-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 20px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 5px;
-    border: 1px border: 1px solid rgba(255, 206, 75, 0.1);
-}
-
-.property-item {
-    display: flex;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 8px;
-    border-radius: 4px;
-    border-left: 3px solid #ffce4b;
-}
-
-.property-icon {
-    width: 25px;
-    height: 25px;
-    margin-right: 10px;
-    opacity: 0.8;
-}
-
-.property-info {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
-
-.prop-title {
-    font-size: 10px;
-    color: #aaa;
-    text-transform: uppercase;
-}
-
-.prop-value {
-    font-size: 12px;
-    color: white;
-    font-weight: bold;
-}
-#radio-numpad {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(15, 15, 15, 0.98);
-    border: 1px solid #ffce4b;
-    padding: 15px;
-    display: none;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    z-index: 6000;
-    border-radius: 10px;
-    box-shadow: 0 0 30px rgba(0,0,0,0.8);
-}
-
-.num-btn {
-    background: #222;
-    color: white;
-    border: 1px solid #444;
-    padding: 15px;
-    font-size: 18px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: 0.2s;
-}
-
-.num-btn:hover { background: #ffce4b; color: black; }
-
-#radio-display {
-    grid-column: span 3;
-    background: #000;
-    color: #ffce4b;
-    padding: 10px;
-    font-family: 'Courier New', monospace;
-    font-size: 20px;
-    text-align: right;
-    margin-bottom: 10px;
-    border: 1px inset #333;
-}
-.weight-container {
-    width: 100%;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.4);
-    margin-bottom: 5px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.weight-bar-bg {
-    width: 60%;
-    height: 4px;
-    background: #333;
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-#weight-fill {
-    width: 0%;
-    height: 100%;
-    background: #ffce4b;
-    transition: width 0.3s ease;
-}
-
-.weight-text {
-    font-size: 11px;
-    color: #ffce4b;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-}
-#context-menu {
-    position: absolute;
-    background: rgba(10, 10, 10, 0.95);
-    border: 1px solid #ffce4b;
-    width: 120px;
-    display: none;
-    z-index: 7000;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    border-radius: 3px;
-}
-
-.context-option {
-    padding: 10px;
-    color: white;
-    font-size: 11px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: 0.2s;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.context-option:hover {
-    background: #ffce4b;
-    color: black;
-    font-weight: bold;
-}
-
-.context-option:last-child { border-bottom: none; }
-#notification-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 280px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 9999;
-}
-
-.notif {
-    background: rgba(0, 0, 0, 0.9);
-    border-left: 4px solid #ffce4b;
-    padding: 12px;
-    color: white;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
-    animation: slideIn 0.3s ease forwards;
-}
-
-@keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-.notif.success { border-color: #4bffeb; }
-.notif.error { border-color: #ff4b4b; }
-
-.notif-title {
-    display: block;
-    font-weight: bold;
-    color: #ffce4b;
-    margin-bottom: 4px;
-    font-size: 10px;
-    text-transform: uppercase;
-}
-.slot img.dragging {
-    opacity: 0.5;
-    transform: scale(1.2);
-    filter: brightness(1.5) drop-shadow(0 0 10px #ffce4b);
-}
-
-.slot.drag-over {
-    background: rgba(255, 206, 75, 0.1);
-    border: 1px dashed #ffce4b;
-}
-#drop-zone {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    z-index: 500; /* Detrás del inventario pero frente al juego */
-    display: none;
-}
-
-.drop-indicator {
-    position: absolute;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 75, 75, 0.2);
-    border: 2px dashed #ff4b4b;
-    color: #ff4b4b;
-    padding: 15px 30px;
-    border-radius: 10px;
-    font-weight: bold;
-    text-transform: uppercase;
-    pointer-events: none;
-}
-#split-dialog {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(10, 10, 10, 0.98);
-    border: 1px solid #ffce4b;
-    padding: 20px;
-    display: none;
-    z-index: 8000;
-    border-radius: 5px;
-    text-align: center;
-    box-shadow: 0 0 50px rgba(0,0,0,0.9);
-}
-
-#split-input {
-    background: #000;
-    border: 1px solid #444;
-    color: #ffce4b;
-    padding: 10px;
-    width: 80px;
-    text-align: center;
-    font-size: 18px;
-    margin: 15px 0;
-    font-family: 'Courier New', monospace;
-}
-
-.split-btn {
-    background: #ffce4b;
-    color: black;
-    border: none;
-    padding: 10px 20px;
-    font-weight: bold;
-    cursor: pointer;
-    text-transform: uppercase;
-}
-.equipment-slots {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-.equip-slot {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 206, 75, 0.3);
-    border-radius: 5px;
-    pointer-events: all;
     display: flex;
+    justify-content: center; /* Centrado horizontal */
     align-items: center;
-    justify-content: center;
-    transition: 0.3s;
+    padding: 50px;
+    box-sizing: border-box;
 }
 
-.equip-slot:hover {
-    border-color: #ffce4b;
-    box-shadow: 0 0 10px rgba(255, 206, 75, 0.2);
-}
+.hidden { display: none !important; }
 
-/* Posiciones estratégicas */
-.slot-head { top: 15%; left: 10%; }
-.slot-mask { top: 30%; left: 10%; }
-.slot-glasses { top: 45%; left: 10%; }
-
-.slot-torso { top: 15%; right: 10%; }
-.slot-vest { top: 30%; right: 10%; }
-.slot-bag { top: 45%; right: 10%; }
-
-.equip-slot::after {
-    content: attr(data-label);
-    position: absolute;
-    bottom: -15px;
-    font-size: 8px;
-    color: #666;
-    text-transform: uppercase;
-}
-.slot[data-slot="1"]::before, 
-.slot[data-slot="2"]::before, 
-.slot[data-slot="3"]::before, 
-.slot[data-slot="4"]::before {
-    content: attr(data-slot);
-    position: absolute;
-    top: 2px;
-    left: 5px;
-    font-size: 9px;
-    color: rgba(255, 206, 75, 0.5);
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-}
-#item-tooltip {
-    position: absolute;
-    background: rgba(5, 5, 5, 0.95);
-    border: 1px solid #ffce4b;
-    padding: 10px;
-    color: white;
-    font-family: 'Courier New', monospace;
-    font-size: 11px;
-    pointer-events: none;
-    display: none;
-    z-index: 10000;
-    min-width: 150px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.8);
-}
-
-.tooltip-title {
-    color: #ffce4b;
-    font-weight: bold;
-    text-transform: uppercase;
-    border-bottom: 1px solid #333;
-    margin-bottom: 5px;
-    display: block;
-}
-
-.metadata-line {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 3px;
-    color: #aaa;
-}
-
-.metadata-value {
-    color: #fff;
-}
-.inventory-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 50px;
-    width: 90%;
-}
-
-#secondary-inventory {
+/* Paneles Laterales */
+.inventory-panel {
     width: 400px;
-    height: 600px;
-    background: rgba(0, 0, 0, 0.85);
-    border: 1px solid rgba(255, 206, 75, 0.2);
-}
-.recipe-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #4bffeb33;
-    margin-bottom: 5px;
-    padding: 8px;
+    height: 700px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 3px;
+    flex-direction: column;
 }
 
-.recipe-info { text-align: left; }
-.recipe-name { color: #4bffeb; font-size: 11px; font-weight: bold; }
-.recipe-mats { font-size: 9px; color: #888; }
+#left-panel { margin-right: 20px; }
+#right-panel { margin-left: 20px; }
 
-.craft-btn {
-    background: #4bffeb;
-    color: #000;
-    border: none;
-    padding: 5px 10px;
-    font-size: 10px;
+.panel-header {
+    padding: 15px;
+    background-color: rgba(30, 30, 30, 0.8);
+    border-bottom: 1px solid var(--border-color);
     font-weight: bold;
-    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 1px;
 }
 
-.craft-btn:hover { background: #fff; }
-#lockpick-game {
-    position: fixed;
+.slots-container {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 slots por fila */
+    gap: 10px;
+    overflow-y: auto; /* Scroll si hay muchos ítems */
+}
+
+/* Slots Minimalistas */
+.slot {
+    width: var(--slot-size);
+    height: var(--slot-size);
+    background-color: rgba(40, 40, 40, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.slot:hover {
+    background-color: rgba(60, 60, 60, 0.8);
+}
+
+.slot img {
+    max-width: 80%;
+    max-height: 80%;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 300px;
-    height: 20px;
-    background: rgba(0,0,0,0.8);
-    border: 2px solid #444;
-    display: none;
-    z-index: 30000;
 }
 
-.lockpick-target {
-    position: absolute;
-    width: 40px;
-    height: 100%;
-    background: rgba(75, 255, 235, 0.5);
-    left: 70%; /* Zona de éxito */
-}
-
-.lockpick-bar {
-    position: absolute;
-    width: 5px;
-    height: 100%;
-    background: #ffce4b;
-    left: 0%;
-}
-.durability-bar {
+.slot-count {
     position: absolute;
     bottom: 5px;
-    left: 5px;
     right: 5px;
-    height: 3px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 2px;
-    overflow: hidden;
-    display: none; /* Se activa solo si el ítem tiene durabilidad */
+    font-size: 12px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+/* Durabilidad Estilo Clean */
+.durability-bar {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .durability-fill {
     height: 100%;
+    background-color: var(--accent-color);
+}
+
+/* Centro: Personaje */
+#character-view {
+    flex: 1;
+    height: 700px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#ped-container {
     width: 100%;
-    transition: width 0.3s ease, background-color 0.3s ease;
+    height: 100%;
+    /* FiveM renderiza aquí */
+}
+
+/* Footer y Tooltip (Simplificados) */
+#inventory-footer {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 100px;
+}
+
+.hotkeys-bar { display: flex; gap: 10px; }
+.hotkey-slot {
+    width: 30px; height: 30px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px;
+}
+
+#tooltip {
+    position: fixed;
+    background-color: rgba(20, 20, 20, 0.98);
+    border: 1px solid var(--accent-color);
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1000;
 }

@@ -2,40 +2,47 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <title>LifeOS Inventory - Centered & Clean</title>
     <link rel="stylesheet" href="style.css">
-    <title>LifeOS Inventory V3 - jsjuhsju</title>
 </head>
 <body>
-    <div class="main-wrapper">
-        <div class="inventory-container">
-            
-            <div id="external-panel" class="panel" style="display: none;">
-                <div id="station-label" class="header">BAÚL / ARMARIO</div>
-                <div class="content">
-                    <div id="station-grid" class="inventory-grid">
-                        </div>
+    <div id="inventory-main" class="hidden">
+        
+        <div class="inventory-panel" id="left-panel">
+            <div class="panel-header">CONTENEDOR EXTERNO</div>
+            <div class="slots-container" id="secondary-slots">
                 </div>
-            </div>
+        </div>
 
-            <div class="character-panel">
-                <div class="player-preview">
-                    <div class="ped-container"></div>
-                <div class="equipment-slots">
-                    <div class="equip-slot slot-head" data-slot="head" data-label="Cabeza"></div>
-                    <div class="equip-slot slot-mask" data-slot="mask" data-label="Máscara"></div>
-                    <div class="equip-slot slot-glasses" data-slot="glasses" data-label="Gafas"></div>
-                    <div class="equip-slot slot-torso" data-slot="torso" data-label="Ropa"></div>
-                    <div class="equip-slot slot-vest" data-slot="vest" data-label="Chaleco"></div>
-                    <div class="equip-slot slot-bag" data-slot="bag" data-label="Mochila"></div>
+        <div id="character-view">
+            <div id="ped-container"></div>
+        </div>
+
+        <div class="inventory-panel" id="right-panel">
+            <div class="panel-header">MOCHILA - <span id="current-weight">0</span>/<span id="max-weight">50</span>kg</div>
+            <div class="slots-container" id="main-slots">
                 </div>
-                <div class="property-container">
-                    <div class="property-item">
-                        <div class="property-info"><span class="prop-title">Vehículo</span><span class="prop-value" id="val-car">Ninguno</span></div>
-                    </div>
-                    <div class="property-item">
-                        <div class="property-info"><span class="prop-title">Propiedad</span><span class="prop-value" id="val-house">Sin Hogar</span></div>
-                    </div>
-                    <div class="property-item">
-                        <div class="property-info"><span class="prop-title">Frecuencia Radio</span><span class="prop-value" id="val-radio">0.0 MHz</span></div>
-                    </div>
-                </div>
+        </div>
+
+        <div id="inventory-footer">
+            <div class="version">LifeOS v1.1 - Minimalist Centered</div>
+            <div class="hotkeys-bar">
+                <div class="hotkey-slot" data-key="1">1</div>
+                <div class="hotkey-slot" data-key="2">2</div>
+                <div class="hotkey-slot" data-key="3">3</div>
+                <div class="hotkey-slot" data-key="4">4</div>
+            </div>
+        </div>
+
+        <div id="tooltip" class="hidden"></div>
+    </div>
+
+    <div id="lockpick-game">
+        <div class="lockpick-target"></div>
+        <div class="lockpick-bar"></div>
+    </div>
+
+    <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+    <script src="script.js" type="text/javascript"></script>
+</body>
+</html>
