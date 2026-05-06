@@ -67,3 +67,41 @@ RegisterNUICallback("exit", function(data)
         SetVehicleDoorShut(vehicle, 5, false)
     end
 end)
+-- Actualizar vitales al abrir el inventario
+function SendStatusToUI()
+    local playerPed = PlayerPedId()
+    local health = GetEntityHealth(playerPed) - 100 -- En FiveM la vida base es 100-200
+    local armor = GetPedArmour(playerPed)
+    
+    -- Aquí podrías integrar tus variables de hambre/sed si usas ESX o QB
+    local hunger = 75 -- Ejemplo
+    local thirst = 50 -- Ejemplo
+
+    SendNUIMessage({
+        type = "update_status",
+        health = health,
+        armor = armor,
+        hunger = hunger,
+        thirst = thirst
+    })
+end
+
+-- Modificamos la función que ya teníamos para que llame a los vitales
+local oldToggleInventory = toggleInventory
+function toggleInventory(bool)
+    if bool then SendStatusToUI() end
+    oldToggleInventory(bool)
+end
+-- Asegurar que el juego se pause visualmente al abrir
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        if display then
+            -- Desactivar controles de cámara y ataques mientras el inv está abierto
+            DisableControlAction(0, 1, true) -- LookLeftRight
+            DisableControlAction(0, 2, true) -- LookUpDown
+            DisableControlAction(0, 24, true) -- Attack
+            DisableControlAction(0, 25, true) -- Aim
+        end
+    end
+end)

@@ -269,3 +269,216 @@ function addItemToSlot(slotId, itemName) {
         slot.onmouseleave = () => hideTooltip();
     }
 }
+// Función para actualizar los niveles visuales
+function updateStatus(data) {
+    if (data.health) document.getElementById('health-bar').style.width = data.health + "%";
+    if (data.armor) document.getElementById('armor-bar').style.width = data.armor + "%";
+    if (data.hunger) document.getElementById('hunger-bar').style.width = data.hunger + "%";
+    if (data.thirst) document.getElementById('thirst-bar').style.width = data.thirst + "%";
+}
+
+// Escuchar los datos reales del servidor
+window.addEventListener('message', function(event) {
+    if (event.data.type === "update_status") {
+        updateStatus(event.data);
+    }
+});
+// Función para verificar si tienes las llaves o la radio
+function updatePropertyPanel(inventoryItems) {
+    let hasCarKeys = false;
+    let hasHouseKeys = false;
+    let hasRadio = false;
+
+    // Escaneamos los objetos que hay en los slots
+    inventoryItems.forEach(item => {
+        if (item.name === "llaves_coche") hasCarKeys = true;
+        if (item.name === "llaves_casa") hasHouseKeys = true;
+        if (item.name === "radio") hasRadio = true;
+    });
+
+    // Actualizamos la vista según si los encontró o no
+    document.getElementById('val-car').innerText = hasCarKeys ? "MATRÍCULA: [34ABC]" : "SIN LLAVES";
+    document.getElementById('val-car').parentElement.parentElement.style.opacity = hasCarKeys ? "1" : "0.3";
+
+    document.getElementById('val-house').innerText = hasHouseKeys ? "CALLE 123, APTO 4" : "SIN LLAVES";
+    document.getElementById('val-house').parentElement.parentElement.style.opacity = hasHouseKeys ? "1" : "0.3";
+
+    document.getElementById('val-radio').innerText = hasRadio ? "104.5 MHz" : "APAGADA";
+    document.getElementById('val-radio').parentElement.parentElement.style.opacity = hasRadio ? "1" : "0.3";
+}
+// Cada vez que renderizamos los items, chequeamos las propiedades
+const oldRefresh = refreshInventory || function() {}; 
+function refreshInventory(items) {
+    oldRefresh(items);
+    updatePropertyPanel(items);
+}
+// Crear el HTML del teclado dinámicamente
+const radioHTML = `
+    <div id="radio-numpad">
+        <div id="radio-display">0.0</div>
+        <button class="num-btn" onclick="addNum('1')">1</button>
+        <button class="num-btn" onclick="addNum('2')">2</button>
+        <button class="num-btn" onclick="addNum('3')">3</button>
+        <button class="num-btn" onclick="addNum('4')">4</button>
+        <button class="num-btn" onclick="addNum('5')">5</button>
+        <button class="num-btn" onclick="addNum('6')">6</button>
+        <button class="num-btn" onclick="addNum('7')">7</button>
+        <button class="num-btn" onclick="addNum('8')">8</button>
+        <button class="num-btn" onclick="addNum('9')">9</button>
+        <button class="num-btn" style="background:#8b0000" onclick="closeRadio()">X</button>
+        <button class="num-btn" onclick="addNum('0')">0</button>
+        <button class="num-btn" style="background:#006400" onclick="setFrequency()">OK</button>
+    </div>`;
+document.body.insertAdjacentHTML('beforeend', radioHTML);
+
+let currentFreq = "";
+
+function addNum(num) {
+    if (currentFreq.length < 5) {
+        currentFreq += num;
+        document.getElementById('radio-display').innerText = currentFreq + " MHz";
+    }
+}
+
+function setFrequency() {
+    SendNotification("Frecuencia establecida: " + currentFreq + " MHz", "success");
+    document.getElementById('val-radio').innerText = currentFreq + " MHz";
+    // Aquí avisamos a Lua/Mumble
+    closeRadio();
+}
+
+function closeRadio() {
+    document.getElementById('radio-numpad').style.display = 'none';
+    currentFreq = "";
+}
+
+// Abrir si el panel de radio tiene opacidad 1 (posee el ítem)
+document.getElementById('val-radio').parentElement.parentElement.onclick = function() {
+    if (this.style.opacity === "1") {
+        document.getElementById('radio-numpad').style.display = 'grid';
+    }
+};
+function updateInventoryWeight(items) {
+    let totalWeight = 0;
+    const maxWeight = 25.0; // Límite de la mochila
+
+    items.forEach(item => {
+        // Buscamos el peso en nuestra base de datos de items
+        const itemInfo = ItemDatabase[item.name];
+        if (itemInfo && itemInfo.weight) {
+            totalWeight += (itemInfo.weight * item.amount);
+        }
+    });
+
+    // Actualizar visualmente
+    const percentage = (totalWeight / maxWeight) * 100;
+    document.getElementById('weight-fill').style.width = Math.min(percentage, 100) + "%";
+    document.getElementById('weight-label').innerText = totalWeight.toFixed(1) + " / " + maxWeight.toFixed(1) + " kg";
+
+    // Cambiar color si está muy lleno
+    if (percentage >= 90) {
+        document.getElementById('weight-fill').style.background = "#ff4b4b";
+    } else {
+        document.getElementById('weight-fill').style.background = "#ffce4b";
+    }
+}
+// Crear el contenedor del menú
+const contextMenu = document.createElement('div');
+contextMenu.id = 'context-menu';
+contextMenu.innerHTML = `
+    <div class="context-option" onclick="actionItem('use')">Usar</div>
+    <div class="context-option" onclick="actionItem('give')">Entregar</div>
+    <div class="context-option" onclick="actionItem('drop')">Tirar</div>
+`;
+document.body.appendChild(contextMenu);
+
+let selectedItem = null;
+
+// Bloquear el menú original del navegador y mostrar el nuestro
+window.oncontextmenu = function(e) {
+    const slot = e.target.closest('.slot');
+    if (slot && slot.getAttribute('data-item')) {
+        e.preventDefault();
+        selectedItem = slot.getAttribute('data-item');
+        
+        contextMenu.style.display = 'block';
+        contextMenu.style.left = e.pageX + 'px';
+        contextMenu.style.top = e.pageY + 'px';
+    } else {
+        contextMenu.style.display = 'none';
+    }
+};
+
+// Cerrar si hacemos click normal en otro lado
+window.onclick = function() {
+    contextMenu.style.display = 'none';
+};
+
+function actionItem(type) {
+    if (!selectedItem) return;
+    
+    if (type === 'use') {
+        SendNotification("Usando: " + selectedItem, "success");
+        // Aquí llamaríamos a la barra de progreso que hicimos antes
+        startProgressBar(3000, "Usando " + selectedItem);
+    }
+    
+    contextMenu.style.display = 'none';
+}
+// Controlador de sonidos
+function playSound(file, volume = 0.5) {
+    let audio = new Audio('sounds/' + file + '.ogg');
+    audio.volume = volume;
+    audio.play().catch(e => console.log("Esperando interacción para sonar"));
+}
+
+// Sonido al pasar el ratón por los slots
+document.addEventListener('mouseover', function(e) {
+    if (e.target.closest('.slot')) {
+        playSound('hover', 0.1);
+    }
+});
+
+// Sonido al abrir el menú de contexto
+window.addEventListener('contextmenu', function(e) {
+    if (e.target.closest('.slot')) {
+        playSound('click_box', 0.3);
+    }
+});
+window.addEventListener('message', function(event) {
+    if (event.data.type === "ui") {
+        if (event.data.status) {
+            playSound('open_bag', 0.4);
+        } else {
+            playSound('close_bag', 0.3);
+        }
+    }
+});
+function SendNotification(msg, type = "info") {
+    let container = document.getElementById('notification-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        document.body.appendChild(container);
+    }
+
+    const notif = document.createElement('div');
+    notif.className = `notif ${type}`;
+    
+    const title = type === "error" ? "SISTEMA - ERROR" : "SISTEMA - INFO";
+    
+    notif.innerHTML = `
+        <span class="notif-title">${title}</span>
+        <div class="notif-msg">${msg}</div>
+    `;
+
+    container.appendChild(notif);
+
+    // Sonido de aviso (si ya subiste sonidos)
+    if (typeof playSound === "function") playSound('notify', 0.2);
+
+    setTimeout(() => {
+        notif.style.opacity = '0';
+        setTimeout(() => notif.remove(), 500);
+    }, 5000);
+}
