@@ -105,3 +105,29 @@ Citizen.CreateThread(function()
         end
     end
 end)
+-- Función para manejar la animación de la mochila/bolsillos
+function PlayInventoryAnim(status)
+    local playerPed = PlayerPedId()
+    local animDict = "pickup_object" -- Diccionario de animación
+    local animName = "putdown_low"   -- Nombre de la animación (puedes cambiarla por 'idle')
+
+    if status then
+        -- Cargar el diccionario
+        RequestAnimDict(animDict)
+        while not HasAnimDictLoaded(animDict) do
+            Citizen.Wait(10)
+        end
+        -- Ejecutar animación en bucle mientras esté abierto
+        TaskPlayAnim(playerPed, animDict, animName, 8.0, -8.0, -1, 49, 0, false, false, false)
+    else
+        -- Detener animación al cerrar
+        StopAnimTask(playerPed, animDict, animName, 1.0)
+    end
+end
+
+-- Actualizamos el trigger principal
+local oldToggle = toggleInventory
+function toggleInventory(bool)
+    PlayInventoryAnim(bool) -- Llamamos a la animación aquí
+    if oldToggle then oldToggle(bool) end
+end

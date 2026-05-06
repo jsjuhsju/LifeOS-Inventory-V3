@@ -504,3 +504,13 @@ body {
     font-size: 10px;
     text-transform: uppercase;
 }
+.slot img.dragging {
+    opacity: 0.5;
+    transform: scale(1.2);
+    filter: brightness(1.5) drop-shadow(0 0 10px #ffce4b);
+}
+
+.slot.drag-over {
+    background: rgba(255, 206, 75, 0.1);
+    border: 1px dashed #ffce4b;
+}
