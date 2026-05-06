@@ -61,3 +61,20 @@ RegisterNetEvent('LifeOS_Inventory:GiveCraftedItem', function(data)
     AddItem(src, data.item, 1)
     TriggerClientEvent('LifeOS_Inventory:Notification', src, "Has fabricado un objeto", "success")
 end)
+-- Sistema de validación de estado de objeto
+RegisterNetEvent('LifeOS_Inventory:UseItem', function(itemName, slot)
+    local src = source
+    local itemData = GetItemInSlot(src, slot) -- Función que ya tenemos
+
+    if itemData.durability <= 0 then
+        TriggerClientEvent('LifeOS_Inventory:Notification', src, "Este objeto está roto. Necesitas repararlo en una mesa.", "error")
+        return -- Bloqueamos el uso
+    end
+
+    -- Si tiene durabilidad, procedemos con el uso normal
+    TriggerEvent('LifeOS_Inventory:ExecuteItemAction', src, itemName)
+    
+    -- Bajamos la durabilidad por uso (ejemplo: -5% cada vez que se usa)
+    local newDurability = itemData.durability - 5
+    UpdateItemDurability(src, slot, newDurability)
+end)

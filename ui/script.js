@@ -76,3 +76,16 @@ function openSecondary(type, id, inventory) {
         top: e.pageY + 15 + 'px'
     });
 });
+// Añadimos a la lógica de la mesa que ya tenemos
+function repairItem(slot) {
+    $.post('https://LifeOS_Inventory/RepairItem', JSON.stringify({
+        slot: slot,
+        materialsNeeded: { metal: 1, tools: 1 } // Coste de reparación
+    }), function(success) {
+        if (success) {
+            SendNotification("Objeto reparado", "success");
+        } else {
+            SendNotification("No tienes materiales para reparar", "error");
+        }
+    });
+}
